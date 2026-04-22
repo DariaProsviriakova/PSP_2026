@@ -26,9 +26,44 @@
         <div class="rectangle-spacing2">
             <span class="word-spacing">
                 <a href="index.html" class="menu-link">ГЛАВНАЯ</a>
+                <a href="calculator.html" class="menu-link">КАЛЬКУЛЯТОР</a>
                 НОВОСТИ МКС НЕБО ПЛАНЕТЫ
+                <a href="info.html" class="info-trigger">ИНФОРМАЦИЯ</a>
+
         </div>
     </div>
     <h3> Просвирякова Дарья </h3>
     <h3> ИУ5-43Б </h3>
     <h3> Лабораторная работа 1 </h3>
+
+    <script>
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const themeIcon = document.getElementById('themeIcon');
+
+            if (currentTheme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeIcon.textContent = '🌙';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                themeIcon.textContent = '☀️';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+
+            const themeIcon = document.getElementById('themeIcon');
+
+            if (savedTheme === 'light') {
+                themeIcon.textContent = '☀️';
+            } else {
+                themeIcon.textContent = '🌙';
+            }
+
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+        });
+    </script>
