@@ -6,6 +6,7 @@ export class PlanetPage {
     constructor(parent, id) {
         this.parent = parent;
         this.id = id;
+        this.currentViewer = null;
     }
 
     get pageRoot() {
@@ -32,30 +33,37 @@ export class PlanetPage {
                 id: "mars",
                 src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMfPEoNsnNTx3qT3B6LY0twJDKfa9rOijViw&s",
                 title: "Марс",
-                text: "Марс — четвёртая планета от Солнца. Названа в честь древнеримского бога войны. На Марсе находится самая высокая гора в Солнечной системе — вулкан Олимп (21 км). Температура на поверхности колеблется от -153°C до +20°C. У Марса есть два спутника: Фобос и Деймос."
+                text: "Марс — четвёртая планета от Солнца. Названа в честь древнеримского бога войны. На Марсе находится самая высокая гора в Солнечной системе — вулкан Олимп (21 км). Температура на поверхности колеблется от -153°C до +20°C. У Марса есть два спутника: Фобос и Деймос.",
+                modelPath: "./models/mars.glb"
             },
             jupiter: {
                 id: "jupiter",
                 src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxltsnIy7ZmDBlievWQFGJMHKMVlc5NiE8Ww&s",
                 title: "Юпитер",
-                text: "Юпитер — самая большая планета Солнечной системы. Его масса в 2,5 раза больше массы всех остальных планет вместе взятых. Юпитер состоит из водорода и гелия. Большое красное пятно — гигантский шторм, который бушует более 300 лет. У Юпитера 79 известных спутников."
+                text: "Юпитер — самая большая планета Солнечной системы. Его масса в 2,5 раза больше массы всех остальных планет вместе взятых. Юпитер состоит из водорода и гелия. Большое красное пятно — гигантский шторм, который бушует более 300 лет. У Юпитера 79 известных спутников.",
+                modelPath: "./models/jupiter.glb"
             },
             saturn: {
                 id: "saturn",
                 src: "https://png.pngtree.com/thumb_back/fh260/background/20230611/pngtree-saturn-with-two-rings-on-the-planet-image_2944627.jpg",
                 title: "Сатурн",
-                text: "Сатурн — шестая планета от Солнца, известная своей системой колец. Кольца состоят из льда и камней. Сатурн — наименее плотная планета. У Сатурна 82 подтверждённых спутника, самый крупный — Титан, который больше планеты Меркурий."
+                text: "Сатурн — шестая планета от Солнца, известная своей системой колец. Кольца состоят из льда и камней. Сатурн — наименее плотная планета. У Сатурна 82 подтверждённых спутника, самый крупный — Титан, который больше планеты Меркурий.",
+                modelPath: "./models/saturn.glb"
             }
         };
         return planets[this.id];
     }
 
     clickBack() {
+        if (this.currentViewer) {
+            this.currentViewer.dispose();
+            this.currentViewer = null;
+        }
         const mainPage = new MainPage(this.parent);
         mainPage.render();
     }
 
-    render() {
+    async render() {
         this.parent.innerHTML = '';
         const html = this.getHTML();
         this.parent.insertAdjacentHTML('beforeend', html);
@@ -66,6 +74,14 @@ export class PlanetPage {
         const container = document.getElementById('planet-detail-container');
         const data = this.getData();
         const planetDetail = new PlanetDetailComponent(container);
-        planetDetail.render(data);
+        
+        await planetDetail.render({
+            ...data,
+            show3DModel: true
+        });
+        
+        if (planetDetail.currentViewer) {
+            this.currentViewer = planetDetail.currentViewer;
+        }
     }
 }
