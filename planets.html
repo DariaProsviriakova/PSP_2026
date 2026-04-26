@@ -3,15 +3,27 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Калькулятор</title>
+    <title>Планеты </title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/examples/jsm/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
 </head>
 
 <body>
     <div class="black-rectangle"></div>
 
     <div class="rectangle-spacing1">
-        <span class="word-spacing">Главная Сервисы Планеты Солнце Луна Изображения Видео Необычное Статьи</span>
+        <span class="word-spacing">
+            Главная Сервисы Планеты Солнце Луна Изображения Видео Необычное Статьи
+        </span>
         <div class="theme-switch">
             <button id="themeToggle" class="theme-toggle">
                 <span id="themeIcon">🌙</span>
@@ -27,21 +39,28 @@
             <span class="word-spacing">
                 <a href="index.html" class="menu-link">ГЛАВНАЯ</a>
                 <a href="calculator.html" class="menu-link">КАЛЬКУЛЯТОР</a>
-                НОВОСТИ МКС НЕБО
-                <a href="planets.html" class="menu-link"> ПЛАНЕТЫ </a>
-                <a href="info.html" class="info-trigger">ИНФОРМАЦИЯ</a>
-
+                НОВОСТИ МКС НЕБО 
+                <a href="planets.html" class="menu-link" id="planetsMenuLink" style="color: rgb(138, 43, 226); font-weight: bold;">ПЛАНЕТЫ</a>
+                <div class="info-dropdown">
+                    <a href="info.html" class="info-trigger">ИНФОРМАЦИЯ</a>
+                </div>
+            </span>
         </div>
     </div>
-    <h3> Просвирякова Дарья </h3>
-    <h3> ИУ5-43Б </h3>
-    <h3> Лабораторная работа 1 </h3>
+
+    <div id="app"></div>
+
+    <footer class="footer">
+        <p style="text-align: center; margin: 0;">&copy; 2026 Космические планеты. Все права защищены.</p>
+    </footer>
+
+    <script type="module" src="planets-main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         function toggleTheme() {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             const themeIcon = document.getElementById('themeIcon');
-
             if (currentTheme === 'light') {
                 document.documentElement.setAttribute('data-theme', 'dark');
                 themeIcon.textContent = '🌙';
@@ -56,15 +75,18 @@
         document.addEventListener('DOMContentLoaded', function () {
             const savedTheme = localStorage.getItem('theme') || 'dark';
             document.documentElement.setAttribute('data-theme', savedTheme);
-
             const themeIcon = document.getElementById('themeIcon');
-
             if (savedTheme === 'light') {
                 themeIcon.textContent = '☀️';
             } else {
                 themeIcon.textContent = '🌙';
             }
-
-            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', toggleTheme);
+            }
         });
     </script>
+</body>
+
+</html>

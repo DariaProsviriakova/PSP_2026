@@ -11,6 +11,9 @@
     --result-color: rgb(85, 27, 193);
     --gray-menu: rgba(21, 21, 40, 0.766);
     --text-color: white;
+    --planet-view: rgb(121, 78, 199);
+    --planet-edit: rgb(243, 156, 18);
+    --planet-delete: rgb(231, 76, 60);
 }
 
 [data-theme="light"] {
@@ -26,6 +29,9 @@
     --result-color: rgb(44, 62, 80);
     --gray-menu: rgb(224, 224, 224);
     --text-color: rgb(0, 0, 0);
+    --planet-view: rgb(41, 128, 185);
+    --planet-edit: rgb(230, 126, 34);
+    --planet-delete: rgb(192, 57, 43);
 }
 
 * {
@@ -632,15 +638,225 @@ div,
     font-size: 14px;
 }
 
+/* ========== СТИЛИ ДЛЯ УПРАВЛЕНИЯ ПЛАНЕТАМИ ========== */
+
+.loading {
+    text-align: center;
+    padding: 50px;
+    color: var(--text-primary);
+}
+
+.loading .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid var(--calc-border);
+    border-top-color: var(--text-secondary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.add-planet-btn {
+    background: var(--btn-bg);
+    color: var(--btn-color);
+    border: 2px solid var(--calc-border);
+    padding: 12px 30px;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.add-planet-btn:hover {
+    background: var(--btn-hover);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.button-group {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.view-btn,
+.edit-btn,
+.delete-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.view-btn {
+    background: var(--btn-color);
+    color: white;
+}
+
+.view-btn:hover {
+    background: var(--btn-hover);
+    transform: scale(1.05);
+}
+
+.edit-btn {
+    background: var(--btn-color);
+    color: white;
+}
+
+.edit-btn:hover {
+    background: var(--btn-hover);
+    transform: scale(1.05);
+}
+
+.delete-btn {
+    background: var(--btn-color);
+    color: white;
+}
+
+.delete-btn:hover {
+    background: var(--btn-hover);
+    transform: scale(1.05);
+}
+
+.card-header {
+    background: var(--calc-bg);
+    padding: 15px;
+    border-radius: 10px 10px 0 0;
+    border-bottom: 2px solid var(--calc-border);
+    cursor: pointer;
+}
+
+.card-header .planet-title {
+    color: var(--text-secondary);
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+/* Модальное окно */
+#custom-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.modal-content,
+.form-content {
+    background: var(--calc-bg);
+    border: 3px solid var(--calc-border);
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+}
+
+.modal-content h3,
+.form-content h3 {
+    color: var(--text-secondary);
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.modal-text {
+    color: var(--text-color);
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.modal-buttons,
+.form-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.modal-confirm,
+.modal-cancel,
+.form-save,
+.form-cancel {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.modal-confirm,
+.form-save {
+    background: var(--text-secondary);
+    color: white;
+}
+
+.modal-confirm:hover,
+.form-save:hover {
+    background: var(--btn-hover);
+    transform: scale(1.05);
+}
+
+.modal-cancel,
+.form-cancel {
+    background: #7f8c8d;
+    color: white;
+}
+
+.modal-cancel:hover,
+.form-cancel:hover {
+    background: #95a5a6;
+    transform: scale(1.05);
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    background: var(--bg-color);
+    color: var(--text-color);
+    border: 2px solid var(--calc-border);
+    border-radius: 10px;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.form-textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--text-secondary);
+}
+
 .planet-3d-container {
     width: 100%;
     height: 400px;
-    background: linear-gradient(135deg, #0a0a2a, #1a1a3a);
+    background: var(--calc-bg);
+    border: 2px solid var(--calc-border);
     border-radius: 16px;
     overflow: hidden;
     margin: 20px 0;
     position: relative;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .planet-3d-container canvas {
@@ -659,9 +875,9 @@ div,
 }
 
 .planet-3d-controls button {
-    background: rgba(0, 0, 0, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: white;
+    background: var(--btn-bg);
+    border: 1px solid var(--calc-border);
+    color: var(--btn-color);
     padding: 6px 12px;
     border-radius: 20px;
     cursor: pointer;
@@ -670,8 +886,8 @@ div,
 }
 
 .planet-3d-controls button:hover {
-    background: rgba(99, 102, 241, 0.8);
-    transform: scale(1.05);
+    background: var(--btn-hover);
+    color: white;
 }
 
 .planet-3d-loading {
@@ -679,7 +895,7 @@ div,
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: white;
+    color: var(--text-color);
     text-align: center;
     z-index: 5;
 }
@@ -687,13 +903,9 @@ div,
 .planet-3d-loading .spinner {
     width: 40px;
     height: 40px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-top-color: #6366f1;
+    border: 3px solid var(--calc-border);
+    border-top-color: var(--text-secondary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 0 auto 10px;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
 }
