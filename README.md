@@ -138,6 +138,6 @@ function toggleTheme() {
 
 ## Результат работы
 
-![Фото 1](assets/photo_1)
+![Фото 1](assets/photo_1.png)
 
 ---
