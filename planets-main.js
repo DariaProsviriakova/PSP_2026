@@ -44,7 +44,7 @@ function deletePlanet(planetId) {
     });
 }
 
-function showModal(title, content, showConfirmBtn = true) {
+function showModal(title, content, showConfirmBtn = true, showCancelBtn = false, onConfirm = null) {
     const existingModal = document.getElementById('custom-modal');
     if (existingModal) existingModal.remove();
 
@@ -52,11 +52,14 @@ function showModal(title, content, showConfirmBtn = true) {
     modal.id = 'custom-modal';
     modal.className = 'modal-overlay';
 
+    const cancelBtnHtml = showCancelBtn ? '<button class="modal-cancel btn btn-secondary">Отмена</button>' : '';
+    
     modal.innerHTML = `
         <div class="modal-content-custom">
             <h3>${title}</h3>
             <div class="modal-text">${content}</div>
             <div class="modal-buttons">
+                ${cancelBtnHtml}
                 ${showConfirmBtn ? '<button class="modal-confirm btn btn-primary">Закрыть</button>' : ''}
             </div>
         </div>
@@ -65,7 +68,20 @@ function showModal(title, content, showConfirmBtn = true) {
     document.body.appendChild(modal);
 
     if (showConfirmBtn) {
-        document.querySelector('.modal-confirm').onclick = () => modal.remove();
+        const confirmBtn = document.querySelector('.modal-confirm');
+        if (confirmBtn) {
+            confirmBtn.onclick = () => {
+                if (onConfirm) onConfirm();
+                modal.remove();
+            };
+        }
+    }
+    
+    if (showCancelBtn) {
+        const cancelBtn = document.querySelector('.modal-cancel');
+        if (cancelBtn) {
+            cancelBtn.onclick = () => modal.remove();
+        }
     }
 }
 
@@ -79,7 +95,7 @@ async function showPlanetDetails(id) {
                 <p><strong>ID:</strong> ${planet.id}</p>
             </div>
         `;
-        showModal(`🪐 ${planet.name}`, content);
+        showModal(` ${planet.name}`, content);
     } catch (error) {
         showModal('Ошибка', 'Планета не найдена!');
     }
@@ -92,10 +108,7 @@ function showEditForm(planet) {
 
     modal.innerHTML = `
         <div class="modal-content-custom form-modal">
-            <h3>✏️ Редактировать ${planet.name}</h3>
-            <p style="color: #888; font-size: 12px; margin-bottom: 10px;">
-                ⚠️ В 5-й лабораторной сохранение отключено. Кнопка появится в 6-й ЛР.
-            </p>
+            <h3>Редактировать ${planet.name}</h3>
             <input type="text" id="edit-name" value="${planet.name}" placeholder="Название" class="form-input">
             <textarea id="edit-description" placeholder="Описание" class="form-textarea">${planet.description}</textarea>
             <div class="modal-buttons">
@@ -115,10 +128,7 @@ function showAddForm() {
 
     modal.innerHTML = `
         <div class="modal-content-custom form-modal">
-            <h3>➕ Добавить новую планету</h3>
-            <p style="color: #888; font-size: 12px; margin-bottom: 10px;">
-                ⚠️ В 5-й лабораторной добавление отключено. Кнопка появится в 6-й ЛР.
-            </p>
+            <h3>Добавить новую планету</h3>
             <input type="text" id="add-id" placeholder="ID (например: neptune)" class="form-input" value="neptune">
             <input type="text" id="add-name" placeholder="Название" class="form-input" value="Нептун">
             <textarea id="add-description" placeholder="Описание" class="form-textarea">Восьмая планета от Солнца</textarea>
@@ -130,6 +140,38 @@ function showAddForm() {
 
     document.body.appendChild(modal);
     document.getElementById('add-close').onclick = () => modal.remove();
+}
+
+function showDeleteConfirm(planetId, planetName) {
+    const modal = document.createElement('div');
+    modal.id = 'custom-modal';
+    modal.className = 'modal-overlay';
+
+    modal.innerHTML = `
+        <div class="modal-content-custom form-modal">
+            <h3>Удалить планету?</h3>
+            <div class="modal-text">Вы уверены, что хотите удалить планету "${planetName}"?</div>
+            <div class="modal-buttons">
+                <button id="delete-cancel" class="btn btn-secondary">Отмена</button>
+                <button id="delete-confirm" class="btn btn-primary">Удалить</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+    
+    document.getElementById('delete-cancel').onclick = () => modal.remove();
+    document.getElementById('delete-confirm').onclick = async () => {
+        try {
+            await deletePlanet(planetId);
+            modal.remove();
+            showModal('Успех', 'Планета успешно удалена!');
+            applyFiltersAndRender();
+        } catch (error) {
+            modal.remove();
+            showModal('Ошибка', 'Не удалось удалить планету');
+        }
+    };
 }
 
 function filterPlanetsBySearchTerm(searchTerm) {
@@ -164,7 +206,7 @@ async function applyFiltersAndRender() {
             app.innerHTML = `
                 <div class="container mt-5">
                     <div class="alert alert-danger text-center">
-                        ❌ Ошибка загрузки. Убедитесь, что бэкенд запущен и CORS Unblock включен.
+                        Ошибка загрузки. Убедитесь, что бэкенд запущен и CORS Unblock включен.
                     </div>
                 </div>
             `;
@@ -181,22 +223,21 @@ function renderPlanetsToDOM(planets, totalFiltered, searchTerm) {
                 <div class="filter-panel card p-3 mb-4">
                     <div class="row align-items-end">
                         <div class="col-md-5">
-                            <label for="searchInput" class="form-label">🔍 Поиск по названию (query-параметр name):</label>
+                            <label for="searchInput" class="form-label"> Поиск по названию:</label>
                             <input type="text" id="searchInput" class="form-control" placeholder="Введите название планеты..." value="${searchTerm}">
                         </div>
                         <div class="col-md-3">
-                            <label for="limitInput" class="form-label">📄 Количество планет:</label>
+                            <label for="limitInput" class="form-label">Количество планет:</label>
                             <input type="number" id="limitInput" class="form-control" value="${currentLimit}" min="1" max="20">
                         </div>
                         <div class="col-md-4">
-                            <button id="addPlanetBtn" class="btn btn-outline-primary w-100 mb-2">➕ Добавить планету (форма без сохранения)</button>
-                            <button id="applyFilterBtn" class="btn btn-primary w-100">🔍 Применить фильтр (GET ?name=...)</button>
+                            <div class="add-planet-wrapper">
+                                <button id="addPlanetBtn" class="btn btn-outline-primary w-100 mb-2"> Добавить планету</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="alert alert-info text-center">
-                    😔 Нет планет, соответствующих критериям поиска
-                </div>
+                <div class="text-center text-muted">Планеты не найдены</div>
             </div>
         `;
         setupEventListeners(searchTerm);
@@ -212,9 +253,9 @@ function renderPlanetsToDOM(planets, totalFiltered, searchTerm) {
                 <div class="card-body">
                     <p class="card-text">${planet.description.substring(0, 80)}${planet.description.length > 80 ? '...' : ''}</p>
                     <div class="button-group">
-                        <button class="btn btn-info btn-sm view-btn" data-id="${planet.id}">📖 Просмотр (GET /planets/:id)</button>
-                        <button class="btn btn-warning btn-sm edit-btn" data-id="${planet.id}">✏️ Редактировать (форма без сохранения)</button>
-                        <button class="btn btn-danger btn-sm delete-btn" data-id="${planet.id}">🗑️ Удалить (DELETE)</button>
+                        <button class="btn btn-info btn-sm view-btn" data-id="${planet.id}">Просмотр</button>
+                        <button class="btn btn-warning btn-sm edit-btn" data-id="${planet.id}">Редактировать</button>
+                        <button class="btn btn-danger btn-sm delete-btn" data-id="${planet.id}">Удалить</button>
                     </div>
                 </div>
             </div>
@@ -223,31 +264,16 @@ function renderPlanetsToDOM(planets, totalFiltered, searchTerm) {
     
     app.innerHTML = `
         <div class="container mt-5">
-            <h1 class="text-center mb-4">🌍 Планеты Солнечной системы</h1>
+            <h1 class="text-center mb-4">Планеты Солнечной системы</h1>
             
             <div class="filter-panel card p-3 mb-4">
                 <div class="row align-items-end">
-                    <div class="col-md-5">
-                        <label for="searchInput" class="form-label">🔍 Поиск по названию (query-параметр name):</label>
-                        <input type="text" id="searchInput" class="form-control" placeholder="Введите название планеты..." value="${searchTerm}">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="limitInput" class="form-label">📄 Количество планет (пагинация):</label>
-                        <input type="number" id="limitInput" class="form-control" value="${currentLimit}" min="1" max="20">
-                    </div>
                     <div class="col-md-4">
-                        <button id="addPlanetBtn" class="btn btn-outline-primary w-100 mb-2">➕ Добавить планету (форма без сохранения)</button>
-                        <button id="applyFilterBtn" class="btn btn-primary w-100">🔍 Применить фильтр (GET ?name=...)</button>
+                            <button id="addPlanetBtn" class="btn btn-outline-primary"> Добавить планету</button>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="filter-info alert alert-secondary">
-                <strong>📊 Результаты:</strong> 
-                Найдено: ${totalFiltered} | Показано: ${Math.min(totalFiltered, currentLimit)} |
-                ${searchTerm ? `Поиск: "${searchTerm}" → GET /planets?name=${encodeURIComponent(searchTerm)}` : 'Без фильтра → GET /planets'}
-            </div>
-            
             <div class="row" id="planetsRow">
                 ${planetsHTML}
             </div>
@@ -280,45 +306,15 @@ function setupEventListeners(searchTerm) {
     document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.addEventListener('click', async (e) => {
             e.stopPropagation();
-            if (confirm('Удалить планету?')) {
-                try {
-                    await deletePlanet(btn.dataset.id);
-                    alert('Планета удалена!');
-                    applyFiltersAndRender();
-                } catch (error) {
-                    alert('Ошибка удаления');
-                }
+            try {
+                const planet = await getPlanetData(btn.dataset.id);
+                showDeleteConfirm(btn.dataset.id, planet.name);
+            } catch (error) {
+                showModal('Ошибка', 'Не удалось загрузить данные планеты');
             }
         });
     });
-    
-    const applyBtn = document.getElementById('applyFilterBtn');
-    const searchInput = document.getElementById('searchInput');
-    const limitInput = document.getElementById('limitInput');
-    
-    if (applyBtn) {
-        applyBtn.onclick = () => {
-            currentLimit = parseInt(limitInput?.value) || 4;
-            applyFiltersAndRender();
-        };
-    }
-    
-    if (searchInput) {
-        searchInput.onkeypress = (e) => {
-            if (e.key === 'Enter') {
-                currentLimit = parseInt(limitInput?.value) || 4;
-                applyFiltersAndRender();
-            }
-        };
-    }
-    
-    if (limitInput) {
-        limitInput.onchange = () => {
-            currentLimit = parseInt(limitInput.value) || 4;
-            applyFiltersAndRender();
-        };
-    }
-    
+        
     const addBtn = document.getElementById('addPlanetBtn');
     if (addBtn) {
         addBtn.onclick = showAddForm;
@@ -349,7 +345,7 @@ async function renderPlanets() {
         app.innerHTML = `
             <div class="container mt-5">
                 <div class="alert alert-danger text-center">
-                    ❌ Ошибка: ${error.message}<br>
+                    Ошибка: ${error.message}<br>
                     1. Запустите бэкенд: cd planet-backend && npm run start<br>
                     2. Включите расширение CORS Unblock в Chrome
                 </div>
@@ -387,7 +383,6 @@ function setupThemeToggle() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('ЛР5 запущена - AJAX запросы, фильтрация, без сохранения');
     initTheme();
     setupThemeToggle();
     renderPlanets();

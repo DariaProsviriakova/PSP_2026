@@ -11,9 +11,7 @@
     --result-color: rgb(85, 27, 193);
     --gray-menu: rgba(21, 21, 40, 0.766);
     --text-color: white;
-    --planet-view: rgb(121, 78, 199);
-    --planet-edit: rgb(243, 156, 18);
-    --planet-delete: rgb(231, 76, 60);
+    --card-bg: #2a2a2a;
 }
 
 [data-theme="light"] {
@@ -29,9 +27,7 @@
     --result-color: rgb(44, 62, 80);
     --gray-menu: rgb(224, 224, 224);
     --text-color: rgb(0, 0, 0);
-    --planet-view: rgb(41, 128, 185);
-    --planet-edit: rgb(230, 126, 34);
-    --planet-delete: rgb(192, 57, 43);
+    --card-bg: #e0e0e0;
 }
 
 * {
@@ -178,7 +174,7 @@ h3 {
 }
 
 .contact-link:hover {
-    color: rgb(138, 43, 226);
+    color: rgb(121, 78, 199);
 }
 
 .info-dropdown {
@@ -194,7 +190,7 @@ h3 {
 }
 
 .info-trigger:hover {
-    color: rgb(138, 43, 226);
+    color: rgb(121, 78, 199);
 }
 
 .info-dropdown-content {
@@ -227,7 +223,7 @@ h3 {
 }
 
 .info-dropdown-item:hover {
-    background: rgb(23, 4, 58);
+    background: rgb(121, 78, 199);
     color: white;
 }
 
@@ -245,7 +241,7 @@ h3 {
 }
 
 .menu-link:hover {
-    color: rgb(138, 43, 226);
+    color: rgb(121, 78, 199);
 }
 
 p,
@@ -266,36 +262,16 @@ div,
     font-weight: normal !important;
 }
 
-.btn-primary {
-    background: var(--btn-bg) !important;
-    color: var(--btn-color) !important;
-    border: 2px solid var(--calc-border) !important;
-    border-radius: 10px !important;
-    font-family: 'Segoe UI', 'Arial', sans-serif !important;
-    font-size: 14px !important;
-    font-weight: normal !important;
-}
-
-.btn-primary:hover {
-    background: var(--btn-hover) !important;
-    color: white !important;
-    border-color: var(--btn-hover) !important;
-}
-
 .card {
     display: flex !important;
-    background-color: var(--btn-bg) !important;
+    background-color: #2a2a2a !important;
+    border: 2px solid var(--calc-border) !important;
+    border-radius: 15px !important;
 }
 
 .card-body {
     display: flex !important;
     flex-direction: column !important;
-}
-
-.btn-primary {
-    margin-top: auto !important;
-    align-self: center !important;
-    width: auto !important;
 }
 
 .image-container {
@@ -324,7 +300,7 @@ div,
 }
 
 .planet-title {
-    color: rgb(165, 165, 229);
+    color: var(--text-secondary);
     margin: 0;
     text-align: center;
     font-family: 'Segoe UI', 'Arial', sans-serif !important;
@@ -337,9 +313,8 @@ div,
 }
 
 .planet-card .card {
-    background-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
+    background-color: #2a2a2a !important;
+    border: 2px solid var(--calc-border) !important;
 }
 
 .image-overlay {
@@ -396,7 +371,7 @@ div,
 .planet-detail-card {
     background-color: #1a1a2e !important;
     color: white;
-    border: 1px solid #667eea;
+    border: 1px solid var(--calc-border);
 }
 
 .planet-detail-img {
@@ -418,7 +393,7 @@ div,
 }
 
 .planet-detail-hr {
-    border-color: #667eea;
+    border-color: var(--calc-border);
 }
 
 .planet-detail-fact {
@@ -524,7 +499,7 @@ div,
 }
 
 #lightbox-title {
-    color: rgb(165, 165, 229);
+    color: var(--text-secondary);
     margin-top: 20px;
     font-size: 28px;
     font-family: 'Russo One', sans-serif;
@@ -669,13 +644,11 @@ div,
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    transition: all 0.3s ease;
 }
 
 .add-planet-btn:hover {
     background: var(--btn-hover);
     color: white;
-    transform: translateY(-2px);
 }
 
 .button-group {
@@ -693,43 +666,21 @@ div,
     border-radius: 8px;
     cursor: pointer;
     font-size: 12px;
-    transition: all 0.2s;
+    background: rgb(121, 78, 199) !important;
+    color: white !important;
 }
 
-.view-btn {
-    background: var(--btn-color);
-    color: white;
-}
-
-.view-btn:hover {
-    background: var(--btn-hover);
-    transform: scale(1.05);
-}
-
-.edit-btn {
-    background: var(--btn-color);
-    color: white;
-}
-
-.edit-btn:hover {
-    background: var(--btn-hover);
-    transform: scale(1.05);
-}
-
-.delete-btn {
-    background: var(--btn-color);
-    color: white;
-}
-
+.view-btn:hover,
+.edit-btn:hover,
 .delete-btn:hover {
-    background: var(--btn-hover);
-    transform: scale(1.05);
+    background: rgb(85, 27, 193) !important;
+    color: white !important;
 }
 
 .card-header {
     background: var(--calc-bg);
     padding: 15px;
-    border-radius: 10px 10px 0 0;
+    border-radius: 13px 13px 0 0;
     border-bottom: 2px solid var(--calc-border);
     cursor: pointer;
 }
@@ -793,31 +744,28 @@ div,
     border-radius: 10px;
     cursor: pointer;
     font-size: 14px;
-    transition: all 0.2s;
 }
 
 .modal-confirm,
 .form-save {
-    background: var(--text-secondary);
+    background: rgb(121, 78, 199);
     color: white;
 }
 
 .modal-confirm:hover,
 .form-save:hover {
-    background: var(--btn-hover);
-    transform: scale(1.05);
+    background: rgb(85, 27, 193);
 }
 
 .modal-cancel,
 .form-cancel {
-    background: #7f8c8d;
+    background: #555;
     color: white;
 }
 
 .modal-cancel:hover,
 .form-cancel:hover {
-    background: #95a5a6;
-    transform: scale(1.05);
+    background: #666;
 }
 
 .form-input,
@@ -879,7 +827,6 @@ div,
     border-radius: 20px;
     cursor: pointer;
     font-size: 12px;
-    transition: all 0.2s;
 }
 
 .planet-3d-controls button:hover {
@@ -921,17 +868,16 @@ div,
 }
 
 .modal-content-custom {
-    background: var(--card-bg);
+    background: var(--calc-bg);
     padding: 25px;
     border-radius: 15px;
     min-width: 300px;
     max-width: 500px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
 }
 
 .modal-content-custom h3 {
     margin-bottom: 15px;
-    color: var(--text-color);
+    color: var(--text-secondary);
 }
 
 .modal-text {
@@ -949,41 +895,12 @@ div,
     min-width: 400px;
 }
 
-.form-input, .form-textarea {
-    width: 100%;
-    margin-bottom: 15px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background: var(--input-bg);
-    color: var(--text-color);
-}
-
-.form-textarea {
-    min-height: 100px;
-    resize: vertical;
-}
-
-.filter-panel {
-    background: var(--card-bg);
-    border-radius: 10px;
-    margin-bottom: 20px;
-}
-
 .filter-info {
     margin-bottom: 20px;
 }
 
 .loading-container {
     padding: 50px;
-}
-
-.planet-card {
-    transition: transform 0.3s ease;
-}
-
-.planet-card:hover {
-    transform: translateY(-5px);
 }
 
 .button-group {
@@ -995,4 +912,24 @@ div,
 .button-group .btn {
     flex: 1;
     font-size: 12px;
+}
+
+.add-planet-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+#addPlanetBtn {
+    background: rgb(121, 78, 199) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 25px !important;
+    padding: 10px 20px;
+    align-items: center !important;
+}
+
+#addPlanetBtn:hover {
+    background: rgb(85, 27, 193) !important;
+    color: white !important;
 }
