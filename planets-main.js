@@ -1,10 +1,7 @@
 import { ajax } from './modules/ajax.js';
 import { planetUrls } from './modules/planetUrls.js';
 
-console.log('planets-main.js загружен - ЛР5 (без сохранения)');
-
 let allPlanets = [];
-let currentFilter = '';
 let currentLimit = 4;
 
 function getAllPlanets() {
@@ -166,7 +163,7 @@ function showDeleteConfirm(planetId, planetName) {
             await deletePlanet(planetId);
             modal.remove();
             showModal('Успех', 'Планета успешно удалена!');
-            applyFiltersAndRender();
+            renderPlanets();
         } catch (error) {
             modal.remove();
             showModal('Ошибка', 'Не удалось удалить планету');
@@ -174,73 +171,53 @@ function showDeleteConfirm(planetId, planetName) {
     };
 }
 
-function filterPlanetsBySearchTerm(searchTerm) {
-    const url = searchTerm ? `${planetUrls.getPlanets()}?name=${encodeURIComponent(searchTerm)}` : planetUrls.getPlanets();
+async function renderPlanets() {
+    const app = document.getElementById('app');
     
-    return new Promise((resolve, reject) => {
-        ajax.get(url, (data, status) => {
-            console.log(`GET ${url} - статус:`, status);
-            if (status === 200 && data) {
-                resolve(data);
-            } else {
-                reject(new Error(`HTTP error! status: ${status}`));
-            }
-        });
-    });
-}
-
-async function applyFiltersAndRender() {
-    const searchTerm = document.getElementById('searchInput')?.value || '';
+    app.innerHTML = `
+        <div class="container mt-5 text-center">
+            <div class="loading-container">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
+                <p class="mt-2">Загрузка планет...</p>
+            </div>
+        </div>
+    `;
     
     try {
-        let filteredPlanets = await filterPlanetsBySearchTerm(searchTerm);
-        
-        const limit = currentLimit;
-        const limitedPlanets = filteredPlanets.slice(0, limit);
-        
-        renderPlanetsToDOM(limitedPlanets, filteredPlanets.length, searchTerm);
+        allPlanets = await getAllPlanets();
+        renderPlanetsToDOM(allPlanets);
     } catch (error) {
-        console.error('Ошибка фильтрации:', error);
-        const app = document.getElementById('app');
-        if (app) {
-            app.innerHTML = `
-                <div class="container mt-5">
-                    <div class="alert alert-danger text-center">
-                        Ошибка загрузки. Убедитесь, что бэкенд запущен и CORS Unblock включен.
-                    </div>
+        console.error('Ошибка:', error);
+        app.innerHTML = `
+            <div class="container mt-5">
+                <div class="alert alert-danger text-center">
+                    Ошибка: ${error.message}<br>
+                    1. Запустите бэкенд: cd planet-backend && npm run start<br>
+                    2. Включите расширение CORS Unblock в Chrome
                 </div>
-            `;
-        }
+            </div>
+        `;
     }
 }
 
-function renderPlanetsToDOM(planets, totalFiltered, searchTerm) {
+function renderPlanetsToDOM(planets) {
     const app = document.getElementById('app');
     
     if (!planets || planets.length === 0) {
         app.innerHTML = `
             <div class="container mt-5">
-                <div class="filter-panel card p-3 mb-4">
-                    <div class="row align-items-end">
-                        <div class="col-md-5">
-                            <label for="searchInput" class="form-label"> Поиск по названию:</label>
-                            <input type="text" id="searchInput" class="form-control" placeholder="Введите название планеты..." value="${searchTerm}">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="limitInput" class="form-label">Количество планет:</label>
-                            <input type="number" id="limitInput" class="form-control" value="${currentLimit}" min="1" max="20">
-                        </div>
-                        <div class="col-md-4">
-                            <div class="add-planet-wrapper">
-                                <button id="addPlanetBtn" class="btn btn-outline-primary w-100 mb-2"> Добавить планету</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div class="text-center text-muted">Планеты не найдены</div>
+                <div class="add-planet-wrapper mt-3">
+                    <button id="addPlanetBtn" class="btn btn-outline-primary"> Добавить планету</button>
+                </div>
             </div>
         `;
-        setupEventListeners(searchTerm);
+        const addBtn = document.getElementById('addPlanetBtn');
+        if (addBtn) {
+            addBtn.onclick = showAddForm;
+        }
         return;
     }
     
@@ -266,24 +243,20 @@ function renderPlanetsToDOM(planets, totalFiltered, searchTerm) {
         <div class="container mt-5">
             <h1 class="text-center mb-4">Планеты Солнечной системы</h1>
             
-            <div class="filter-panel card p-3 mb-4">
-                <div class="row align-items-end">
-                    <div class="col-md-4">
-                            <button id="addPlanetBtn" class="btn btn-outline-primary"> Добавить планету</button>
-                        </div>
-                    </div>
-                </div>
+            <div class="add-planet-wrapper mb-4">
+                <button id="addPlanetBtn" class="btn btn-outline-primary"> Добавить планету</button>
             </div>
+            
             <div class="row" id="planetsRow">
                 ${planetsHTML}
             </div>
         </div>
     `;
     
-    setupEventListeners(searchTerm);
+    setupEventListeners();
 }
 
-function setupEventListeners(searchTerm) {
+function setupEventListeners() {
     document.querySelectorAll('.view-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -318,39 +291,6 @@ function setupEventListeners(searchTerm) {
     const addBtn = document.getElementById('addPlanetBtn');
     if (addBtn) {
         addBtn.onclick = showAddForm;
-    }
-}
-
-async function renderPlanets() {
-    const app = document.getElementById('app');
-    
-    app.innerHTML = `
-        <div class="container mt-5 text-center">
-            <div class="loading-container">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Загрузка...</span>
-                </div>
-                <p class="mt-2">Загрузка планет...</p>
-            </div>
-        </div>
-    `;
-    
-    try {
-        allPlanets = await getAllPlanets();
-        currentLimit = 4;
-        currentFilter = '';
-        await applyFiltersAndRender();
-    } catch (error) {
-        console.error('Ошибка:', error);
-        app.innerHTML = `
-            <div class="container mt-5">
-                <div class="alert alert-danger text-center">
-                    Ошибка: ${error.message}<br>
-                    1. Запустите бэкенд: cd planet-backend && npm run start<br>
-                    2. Включите расширение CORS Unblock в Chrome
-                </div>
-            </div>
-        `;
     }
 }
 
