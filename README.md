@@ -69,14 +69,14 @@ git push --set-upstream origin lab_2
 
 Хранение состояния
 
-```javaschipt
+```javascript
 let prefix = '';        // то, что слева от оператора (например: "5+")
 let currentNumber = ''; // текущее вводимое число (например: "3")
 let justCalculated = false; // флаг: только что посчитали?
 ```
 Пример функции вычисления
 
-```javaschipt
+```javascript
 function evaluateExpression(expr) {
     const safeExpr = expr.replace(/x/g, '*').replace(/\^/g, '**');
     const result = Function('"use strict"; return (' + safeExpr + ')')();
@@ -85,7 +85,7 @@ function evaluateExpression(expr) {
 ```
 Обработчик нажатия на кнопки
 
-```javaschipt
+```javascript
 function onDigitButtonClicked(digit) {
     if (justCalculated) {
         prefix = '';
