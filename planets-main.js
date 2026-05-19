@@ -1,44 +1,95 @@
-import { ajax } from './modules/ajax.js';
 import { planetUrls } from './modules/planetUrls.js';
 
 let allPlanets = [];
 let currentLimit = 4;
 
-function getAllPlanets() {
-    return new Promise((resolve, reject) => {
-        ajax.get(planetUrls.getPlanets(), (data, status) => {
-            console.log('GET /planets - статус:', status);
-            if (status === 200 && data) {
-                resolve(data);
-            } else {
-                reject(new Error(`HTTP error! status: ${status}`));
-            }
-        });
-    });
+async function getAllPlanets() {
+    try {
+        const response = await fetch(planetUrls.getPlanets());
+        console.log('GET /planets - статус:', response.status);
+        
+        if (response.ok) {
+            const data = await response.json();
+            return data;
+        } else {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+    } catch (error) {
+        throw new Error(`HTTP error! ${error.message}`);
+    }
 }
 
-function getPlanetData(planetId) {
-    return new Promise((resolve, reject) => {
-        ajax.get(planetUrls.getPlanetById(planetId), (data, status) => {
-            if (status === 200 && data) {
-                resolve(data);
-            } else {
-                reject(new Error(`HTTP error! status: ${status}`));
-            }
-        });
-    });
+async function getPlanetData(planetId) {
+    try {
+        const response = await fetch(planetUrls.getPlanetById(planetId));
+        
+        if (response.ok) {
+            const data = await response.json();
+            return data;
+        } else {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+    } catch (error) {
+        throw new Error(`HTTP error! ${error.message}`);
+    }
 }
 
-function deletePlanet(planetId) {
-    return new Promise((resolve, reject) => {
-        ajax.delete(planetUrls.removePlanetById(planetId), (data, status) => {
-            if (status === 204 || status === 200) {
-                resolve(true);
-            } else {
-                reject(new Error('Ошибка удаления'));
-            }
+async function deletePlanet(planetId) {
+    try {
+        const response = await fetch(planetUrls.removePlanetById(planetId), {
+            method: 'DELETE'
         });
-    });
+        
+        if (response.status === 204 || response.status === 200) {
+            return true;
+        } else {
+            throw new Error('Ошибка удаления');
+        }
+    } catch (error) {
+        throw new Error('Ошибка удаления: ' + error.message);
+    }
+}
+
+async function addPlanet(planetData) {
+    try {
+        const response = await fetch(planetUrls.createPlanet(), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(planetData)
+        });
+        
+        if (response.status === 201 || response.status === 200) {
+            const data = await response.json();
+            return data;
+        } else {
+            throw new Error('Ошибка добавления планеты');
+        }
+    } catch (error) {
+        throw new Error('Ошибка добавления планеты: ' + error.message);
+    }
+}
+
+async function updatePlanet(planetId, planetData) {
+    try {
+        const response = await fetch(planetUrls.updatePlanetById(planetId), {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(planetData)
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            return data;
+        } else {
+            throw new Error('Ошибка обновления планеты');
+        }
+    } catch (error) {
+        throw new Error('Ошибка обновления планеты: ' + error.message);
+    }
 }
 
 function showModal(title, content, showConfirmBtn = true, showCancelBtn = false, onConfirm = null) {
@@ -109,12 +160,30 @@ function showEditForm(planet) {
             <input type="text" id="edit-name" value="${planet.name}" placeholder="Название" class="form-input">
             <textarea id="edit-description" placeholder="Описание" class="form-textarea">${planet.description}</textarea>
             <div class="modal-buttons">
+                <button id="edit-save" class="btn btn-primary">Сохранить</button>
                 <button id="edit-close" class="btn btn-secondary">Закрыть</button>
             </div>
         </div>
     `;
 
     document.body.appendChild(modal);
+    
+    document.getElementById('edit-save').onclick = async () => {
+        const updatedPlanet = {
+            name: document.getElementById('edit-name').value,
+            description: document.getElementById('edit-description').value
+        };
+        
+        try {
+            await updatePlanet(planet.id, updatedPlanet);
+            modal.remove();
+            showModal('Успех', 'Планета успешно обновлена!');
+            renderPlanets();
+        } catch (error) {
+            showModal('Ошибка', 'Не удалось обновить планету');
+        }
+    };
+    
     document.getElementById('edit-close').onclick = () => modal.remove();
 }
 
@@ -126,16 +195,40 @@ function showAddForm() {
     modal.innerHTML = `
         <div class="modal-content-custom form-modal">
             <h3>Добавить новую планету</h3>
-            <input type="text" id="add-id" placeholder="ID (например: neptune)" class="form-input" value="neptune">
-            <input type="text" id="add-name" placeholder="Название" class="form-input" value="Нептун">
-            <textarea id="add-description" placeholder="Описание" class="form-textarea">Восьмая планета от Солнца</textarea>
+            <input type="text" id="add-id" placeholder="ID (например: neptune)" class="form-input">
+            <input type="text" id="add-name" placeholder="Название" class="form-input">
+            <textarea id="add-description" placeholder="Описание" class="form-textarea"></textarea>
             <div class="modal-buttons">
+                <button id="add-save" class="btn btn-primary">Сохранить</button>
                 <button id="add-close" class="btn btn-secondary">Закрыть</button>
             </div>
         </div>
     `;
 
     document.body.appendChild(modal);
+    
+    document.getElementById('add-save').onclick = async () => {
+        const newPlanet = {
+            id: document.getElementById('add-id').value,
+            name: document.getElementById('add-name').value,
+            description: document.getElementById('add-description').value
+        };
+        
+        if (!newPlanet.id || !newPlanet.name) {
+            showModal('Ошибка', 'Заполните ID и название планеты');
+            return;
+        }
+        
+        try {
+            await addPlanet(newPlanet);
+            modal.remove();
+            showModal('Успех', 'Планета успешно добавлена!');
+            renderPlanets();
+        } catch (error) {
+            showModal('Ошибка', 'Не удалось добавить планету');
+        }
+    };
+    
     document.getElementById('add-close').onclick = () => modal.remove();
 }
 
@@ -210,7 +303,7 @@ function renderPlanetsToDOM(planets) {
             <div class="container mt-5">
                 <div class="text-center text-muted">Планеты не найдены</div>
                 <div class="add-planet-wrapper mt-3">
-                    <button id="addPlanetBtn" class="btn btn-outline-primary"> Добавить планету</button>
+                    <button id="addPlanetBtn" class="btn btn-outline-primary">Добавить планету</button>
                 </div>
             </div>
         `;
